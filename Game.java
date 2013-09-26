@@ -1,3 +1,5 @@
+package reversi;
+
 public class Game {
   public static final int BLACK = 1;
   public static final int WHITE = 2;
@@ -9,6 +11,7 @@ public class Game {
 
   public Game (int numHumans) {
     board = new Board();
+    // black traditionally goes first
     switch (numHumans) {
     case 0:
       player1 = new ComputerPlayer(BLACK);
@@ -18,35 +21,46 @@ public class Game {
       player2 = new ComputerPlayer(WHITE);
     case 2:
       player1 = new HumanPlayer(BLACK);
-      player2 = new ComputerPlayer(WHITE);
+      player2 = new HumanPlayer(WHITE);
     }
   }
 
-  public boolean beginGameLoop() {
-    System.out.println(board);
+  /**
+   * Starts the game loop
+   */
+  public void beginGame() {
     Player currentPlayer = player1;
     while (board.existValidMove(currentPlayer.color)) {
+      // display the board and scores
+      System.out.println(board);
+      System.out.println("BLACK: " + board.getScore(BLACK));
+      System.out.println("WHITE: " + board.getScore(WHITE));
+      
       // get the current player to decide a move
       Move m = currentPlayer.getMove(board);
       
       // put their piece on the board
       board.makeMove(m);
-      
-      // display the updated board
-      System.out.println(board);
-      
-      // display the scores
-      
-      
+
       // switch to the other player
       currentPlayer = (currentPlayer.color == WHITE) ? player1 : player2;
     }
-    return false;
+    
+    // Decide who wins
+    int player1Score = board.getScore(BLACK);
+    int player2Score = board.getScore(BLACK);
+    if (player1Score > player2Score) {
+      System.out.println("Black wins!");
+    } else if (player1Score < player2Score){
+      System.out.println("White wins!");
+    } else if (player1Score == player2Score) {
+      System.out.println("Tie!");
+    }
   }
 
   public static void main(String[] args) {
     Game g = new Game(0);
-    g.beginGameLoop();
+    g.beginGame();
   }
 }
 

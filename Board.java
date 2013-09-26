@@ -1,5 +1,9 @@
+package reversi;
+
+import java.util.ArrayList;
+
 public class Board {
-  public static final int SIZE = 8;
+  public static final int SIZE = 4;
   
   public static final char WHITE = 'O';
   public static final char BLACK = 'X';
@@ -41,15 +45,54 @@ public class Board {
     board[center][center - 1] = Game.BLACK;
   }
   
+  boolean set(Move m) {
+    return set(m.row, m.column, m.color);
+  }
+  
   boolean set(int row, int col, int val) {
     if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) return false;
     board[row][col] = val;
+    flip(new Move(row, col, val));
     return true;
+  }
+  
+  public void flip(Move m) {
+    // TODO
   }
   
   int get(int row, int col) {
     if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) return Game.OUT_OF_BOUNDS;
     return board[row][col];
+  }
+  
+  public Move[] getValidMoves(int color) {
+    ArrayList<Move> moves = new ArrayList<Move>();
+    for (int i = 0; i < SIZE; i++) {
+      for (int j = 0; j < SIZE; j++) {
+        Move m = new Move(i, j, color);
+        if (isValid(m)) {
+          moves.add(m);
+        }
+      }
+    }
+    return (Move[]) moves.toArray();
+  }
+  
+  /**
+   * Determines whether a player has any moves left
+   * @param player
+   * @return
+   */
+  public boolean existValidMove(int color) {
+    for (int i = 0; i < SIZE; i++) {
+      for (int j = 0; j < SIZE; j++) {
+        Move m = new Move(i, j, color);
+        if (isValid(m)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**
@@ -58,38 +101,39 @@ public class Board {
    * @return
    */
   public boolean isValid(Move m) {
-    //TODO
     // Traverse in eight directions
-    // N
-    // NE
-    // E
-    // SE
-    // S
-    // SW
-    // W
-    // NW
-    return false;
+    // +y |
+    //    v
+    // +x -->
+    boolean n = traverse(m, -1, 0);
+    boolean nw = traverse(m, -1, 1);
+    boolean w = traverse(m, 0, 1);
+    boolean sw = traverse(m, 1, 1);
+    boolean s = traverse(m, 1, 0);
+    boolean se = traverse(m, 1, -1);
+    boolean e = traverse(m, 0, -1);
+    boolean ne = traverse(m, -1, -1);
+    return n || nw || w || sw || s || se || e || ne;
   }
   
   /**
    * Starting from the point defined in the move, move in the direction
-   * defined by deltaX, deltaY to verify if there is a flip
+   * defined by dirRow, dirCol to verify if there is a flip
    * @param m
-   * @param deltaX
-   * @param deltaY
-   * @return
+   * @param dirRow
+   * @param dirCol
+   * @return 
    */
-  public boolean traverse(Move m, int deltaX, int deltaY) {
-
+  public boolean traverse(Move m, int dirRow, int dirCol) {
     int otherColor = (m.color == Game.BLACK) ? Game.WHITE : Game.BLACK; 
     int currRow = m.row;
     int currCol = m.column;
     boolean lookingForOtherColor = true;
     while (get(currRow, currCol) != Game.OUT_OF_BOUNDS) {
-      currRow += deltaX;
-      currCol += deltaY;
+      currRow += dirRow;
+      currCol += dirCol;
       
-      // Two states: either looking for tiles of the opposite color, or
+      // Two states: looking for tiles of the opposite color, then
       //             looking for one tile of the same color
       if (lookingForOtherColor) {
         if (get(currRow, currCol) == otherColor) {
@@ -98,8 +142,8 @@ public class Board {
           return false;
         }
       } else {
-        if (board[currRow][currCol] == m.color) return true;
-        if (board[currRow][currCol] == Game.EMPTY) return false;
+        if (get(currRow, currCol) == m.color) return true;
+        if (get(currRow, currCol) == Game.EMPTY) return false;
       }
     }
     return false;
@@ -111,27 +155,24 @@ public class Board {
    * @return
    */
   public boolean makeMove(Move m) {
-    //TODO
+    if (isValid(m)) {
+      set(m);
+    }
     return false;
   }
 
 
-
-  /**
-   * Determines whether a player has any moves left
-   * @param player
-   * @return
-   */
-  public boolean existValidMove(int player) {
+  
+  public int getScore(int color) {
+    int score = 0;
     for (int i = 0; i < SIZE; i++) {
       for (int j = 0; j < SIZE; j++) {
-        Move m = new Move(i, j, player);
-        if (isValid(m)) {
-          return true;
+        if (board[i][j] == color) {
+          score++;
         }
       }
     }
-    return false;
+    return score;
   }
   
   /**
@@ -162,9 +203,15 @@ public class Board {
    */
   @Override
   public String toString() {
-    String n = "   a b c d e f g h\n";
+    char columnLetter = 'a';
+    String n = "   ";
     for (int i = 0; i < SIZE; i++) {
-      int row_number = i + 1;
+      n += columnLetter + " ";
+      columnLetter++;
+    }
+    n += "\n";
+    for (int i = 0; i < SIZE; i++) {
+      int row_number = (i + 1) % 10;
       n += row_number + ". ";
       for (int j = 0; j < SIZE; j++) {
         int piece = board[i][j];

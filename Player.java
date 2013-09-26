@@ -1,3 +1,5 @@
+package reversi;
+
 public abstract class Player {
   public int color;
   public Player(int c) {
@@ -5,12 +7,16 @@ public abstract class Player {
   }
   
   public Move getMove(Board b) {
-    return null;
+    Move[] validMoves = b.getValidMoves(color);
+    return validMoves[0];
   }
  
-  
   public boolean hasMove(Board b) {
-    return false;
+    return b.existValidMove(color);
+  }
+  
+  public String toString() {
+    return Integer.toString(color);
   }
 }
 

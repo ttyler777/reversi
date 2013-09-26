@@ -1,3 +1,5 @@
+package reversi;
+
 import java.util.Scanner;
 
 public class HumanPlayer extends Player {
@@ -14,11 +16,5 @@ public class HumanPlayer extends Player {
     int column = input.nextInt();
     return new Move(row, column, this.color);
   }
- 
-  
-  public boolean hasMove(Board b) {
-    return b.existValidMove(this.color);
-  }
-
 }
 

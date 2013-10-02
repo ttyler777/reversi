@@ -57,7 +57,48 @@ public class Board {
   }
   
   public void flip(Move m) {
-    // TODO
+	  
+	  if (traverse(m, -1, 0)) {
+		  flipLine(m, -1, 0);
+	  }
+	  
+	  if (traverse(m, -1, 1)) {
+		  flipLine(m, -1, 1);
+	  }
+	  
+	  if (traverse(m, 0, 1)) {
+		  flipLine(m, 0, 1);
+	  }
+	  
+	  if (traverse(m, 1, 1)) {
+		  flipLine(m, 1, 1);
+	  }
+	  
+	  if (traverse(m, 1, 0)) {
+		  flipLine(m, 1, 0);
+	  }
+	  
+	  if (traverse(m, 1, -1)) {
+		  flipLine(m, 1, -1);
+	  }
+	  
+	  if (traverse(m, 0, -1)) {
+		  flipLine(m, 0, -1);
+	  }
+	  
+	  if (traverse(m, -1, -1)) {
+		  flipLine(m, -1, -1);
+	  }
+  }
+  
+  public void flipLine (Move m, int rowDir, int colDir) {
+	  int column = m.column + colDir;
+	  int row = m.row + rowDir;	  
+	  while (board[row][column] != m.color) {
+		  board[row][column] = m.color;
+		  column = column + colDir;
+		  row = row + rowDir;
+	  }
   }
   
   int get(int row, int col) {
@@ -225,6 +266,5 @@ public class Board {
     }
     return n;
   }
-
 }
 

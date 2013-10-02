@@ -157,6 +157,7 @@ public class Board {
   public boolean makeMove(Move m) {
     if (isValid(m)) {
       set(m);
+      return true;
     }
     return false;
   }

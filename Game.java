@@ -16,12 +16,15 @@ public class Game {
     case 0:
       player1 = new ComputerPlayer(BLACK);
       player2 = new ComputerPlayer(WHITE);
+      break;
     case 1:
       player1 = new HumanPlayer(BLACK);
       player2 = new ComputerPlayer(WHITE);
+      break;
     case 2:
       player1 = new HumanPlayer(BLACK);
       player2 = new HumanPlayer(WHITE);
+      break;
     }
   }
 
@@ -30,7 +33,7 @@ public class Game {
    */
   public void beginGame() {
     Player currentPlayer = player1;
-    while (board.existValidMove(currentPlayer.color)) {
+    while (board.existValidMove(currentPlayer.color)) {    	
       // display the board and scores
       System.out.println(board);
       System.out.println("BLACK: " + board.getScore(BLACK));
@@ -55,8 +58,9 @@ public class Game {
     }
     
     // Decide who wins
+    System.out.println(board);
     int player1Score = board.getScore(BLACK);
-    int player2Score = board.getScore(BLACK);
+    int player2Score = board.getScore(WHITE);
     if (player1Score > player2Score) {
       System.out.println("Black wins!");
     } else if (player1Score < player2Score){

@@ -1,7 +1,9 @@
 package reversi;
 
+import java.util.ArrayList;
+
 public class ComputerPlayer extends Player {
-	public static final int DEPTHLIMIT = 10;
+	public static final int DEPTHLIMIT = 4;
 	public int otherColor;
 
 	public ComputerPlayer(int c) {
@@ -15,26 +17,25 @@ public class ComputerPlayer extends Player {
 			otherColor = 1;
 		}
 		
-		Move[] moves = b.getValidMoves(color);		
+		ArrayList<Move> moves = b.getValidMoves(color);		
 		int depth = 0;
 		int leafRating = 0;
 		
 		Move bestMove = new Move(-1,-1,-1);  //Initialize bestMove,  meant to be replace by real move
 		bestMove.rating = -1000;  
 		
-		for (int element = 0; element < moves.length; element++) {
+		for (int element = 0; element < moves.size(); element++) {
 			/*
 			 * This calculates the new variables to pass to simulateMin
-			 */
+			 */			
 			Board passingBoard = new Board();
-			passingBoard.board = b.board.clone();
-			passingBoard.makeMove(moves[element]);
-			leafRating = leafRating + moves[element].rate(b); ; // Calculates new leaf rating to pass down the tree
-			depth++;
+			b.clone(passingBoard);
+			passingBoard.makeMove(moves.get(element));
+			leafRating = moves.get(element).rate(b); ; // Calculates new leaf rating to pass down the tree	
 
-			moves[element].rating = simulateMin(passingBoard, leafRating, depth); 
-			if (moves[element].rating > bestMove.rating) { // Keeps track of the best move 
-				bestMove = moves[element];
+			int returnRating = simulateMin(passingBoard, leafRating, depth); 
+			if (returnRating > bestMove.rating) { // Keeps track of the best move 
+				bestMove = moves.get(element);
 			}
 		}
 		
@@ -43,24 +44,24 @@ public class ComputerPlayer extends Player {
 
 	private int simulateMax(Board b, int leafRating, int depth) {
 
-		if (depth == DEPTHLIMIT || !(b.existValidMove(color))) {
+		if ((depth > DEPTHLIMIT) || (b.existValidMove(color) == false)) {
 			return leafRating;
 		}
-		int bestMove = 0;
+		int bestMove = -100;
 		int temp;
+		depth++;
+		
 
-		Move[] moves = b.getValidMoves(color);
-		for (int element = 0; element < moves.length; element++) {
-			/*
-			 * This calculates the new variables to pass to simulateMin
-			 */
+		ArrayList<Move> moves = b.getValidMoves(color);
+		for (int element = 0; element < moves.size(); element++) {
+			
+			 //This calculates the new board to pass to simulateMin			 
 			Board passingBoard = new Board();
-			passingBoard.board = b.board.clone();
-			passingBoard.makeMove(moves[element]);
-			leafRating = leafRating + moves[element].rate(b); ; // Calculates new leaf rating to pass down the tree
-			depth++;
+			b.clone(passingBoard);
+			passingBoard.makeMove(moves.get(element));
+			int newLeafRating = leafRating + moves.get(element).rate(b); ; // Calculates new leaf rating to pass down the tree
 
-			temp = simulateMin(passingBoard, leafRating, depth); 
+			temp = simulateMin(passingBoard, newLeafRating, depth); 
 			if (temp > bestMove) { // Keeps track of the best move for this Player
 				bestMove = temp;
 			}
@@ -70,24 +71,25 @@ public class ComputerPlayer extends Player {
 	}
 
 	private int simulateMin(Board b, int leafRating, int depth) {		
-		if (depth == DEPTHLIMIT || !(b.existValidMove(otherColor))) {
+		if ((depth > DEPTHLIMIT) || (b.existValidMove(otherColor) == false)) {
 			return leafRating;
 		}
-		int bestMove = 0;
+		int bestMove = 100;
 		int temp;
+		depth++;
+		
 
-		Move[] moves = b.getValidMoves(otherColor);
-		for (int element = 0; element < moves.length; element++) {
-			/*
-			 * This calculates the new variables to pass to simulateMax
-			 */
+		ArrayList<Move> moves = b.getValidMoves(otherColor);
+		for (int element = 0; element < moves.size(); element++) {
+			
+			 // This calculates the new board to pass to simulateMax			 
 			Board passingBoard = new Board();
-			passingBoard.board = b.board.clone();
-			passingBoard.makeMove(moves[element]);
-			leafRating = leafRating - moves[element].rate(b); // Calculates new leaf rating to pass down the tree
-			depth++;
+			b.clone(passingBoard);
+			passingBoard.makeMove(moves.get(element));
+			
+			int newLeafRating = leafRating - moves.get(element).rate(b); // Calculates new leaf rating to pass down the tree
 
-			temp = simulateMax(passingBoard, leafRating, depth); 
+			temp = simulateMax(passingBoard, newLeafRating, depth); 
 			if (temp < bestMove) { // Keeps track of the best move for this Player
 				bestMove = temp;
 			}

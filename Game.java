@@ -37,13 +37,21 @@ public class Game {
       System.out.println("WHITE: " + board.getScore(WHITE));
       
       // get the current player to decide a move
-      Move m = currentPlayer.getMove(board);
+      Move m = currentPlayer.getMove(board);      
       
       // put their piece on the board
-      board.makeMove(m);
+      boolean goodMove = board.makeMove(m);
+      
+      Player nextPlayer = (currentPlayer.color == WHITE) ? player1 : player2;
+      
+      if (!goodMove) {
+    	  System.out.println("Invalid Move.  Please Try again.");    	  
+      } else if (board.existValidMove(nextPlayer.color)) {
+    	  // switch to the other player
+          currentPlayer = nextPlayer;
+      } //Else repeat this persons turn.  
 
-      // switch to the other player
-      currentPlayer = (currentPlayer.color == WHITE) ? player1 : player2;
+      
     }
     
     // Decide who wins
@@ -59,7 +67,7 @@ public class Game {
   }
 
   public static void main(String[] args) {
-    Game g = new Game(0);
+    Game g = new Game(1);
     g.beginGame();
   }
 }
